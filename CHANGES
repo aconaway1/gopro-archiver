@@ -1,0 +1,3 @@
+* Added check for "MP4" and "mp4" file extension.
+* Files are destined for a directory structure of year/month/day based on create date
+* Changed default file locations to `sample` and `sample/ouput`
