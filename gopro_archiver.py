@@ -3,17 +3,10 @@ import datetime
 import shutil
 import argparse
 import sys
-
+import re
 import yaml
 
 CONFIG_FILE = "config.yml"
-
-# DEFAULT_SOURCE_FOLDER = "/Volumes/Untitled/DCIM/100GOPRO/"
-# DEFAULT_DESTINATION_FOLDER = "/Users/aconaway/Desktop/"
-#
-# DATE_FORMAT = "%Y%m%d"
-#
-# MAX_THREADS = 10
 
 def copy_the_file(source, destination):
     print(f"Moving file to {destination}")
@@ -97,7 +90,6 @@ def main():
     for file in found_files:
         processed_file_count =+ 1
         is_valid_extension = False
-        print(f"{defaults=}")
         for checked_extension in defaults['VALID_EXTENSIONS']:
             cased_extensions = [ checked_extension.upper(), checked_extension.lower()]
             for extension in cased_extensions:
@@ -107,7 +99,7 @@ def main():
 
 
         if not is_valid_extension:
-            print(f"File {file} is not an proper file.")
+            print(f"File {file} does not have the right extension.")
             ignored_files.append(file)
             continue
 
@@ -115,8 +107,15 @@ def main():
         full_source_file_path = f"{source_folder}/{file}"
         # Make sure the file exits
         if not os.path.isfile(full_source_file_path):
-            print(f"{file} does not exists. Skipping.")
+            print(f"{file} does not exists for some reason. It was there a bit ago. Skipping.")
             continue
+
+
+        # Detect file chapters
+        search_result = re.search(f"GX(\d\d)", file, re.IGNORECASE)
+        if search_result:
+            if search_result.group(1) != "01":
+                file = f"{file[:2]}01{file[4:8]}-{search_result.group(1)}{file[8:]}"
 
 
         # Get the filename from the path
