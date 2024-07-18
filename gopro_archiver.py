@@ -18,7 +18,7 @@ CONFIG_FILE = "config.yml"
 def copy_the_file(source, destination):
     print(f"Moving file to {destination}")
     # Copy the file
-    shutil.copyfile(source, destination)
+    shutil.copy2(source, destination)
 
 
 def init_args() -> argparse.ArgumentParser:
@@ -70,6 +70,9 @@ def main():
     if not destination_folder.endswith("/"):
         destination_folder = f"{destination_folder}/"
 
+    print(f"Source dir: {source_folder}")
+    print(f"Destination dir: {destination_folder}")
+
     try:
         # Get the files from the source folder
         found_files = os.listdir(source_folder)
@@ -84,17 +87,28 @@ def main():
         print(f"Couldn't open the destination at {destination_folder}.")
         sys.exit()
 
+
+    # Summary table variables
+    processed_file_count = 0
+    moved_file_count = 0
+    failed_files = []
+    ignored_files = []
+
     for file in found_files:
+        processed_file_count =+ 1
+        is_valid_extension = False
+        print(f"{defaults=}")
+        for checked_extension in defaults['VALID_EXTENSIONS']:
+            cased_extensions = [ checked_extension.upper(), checked_extension.lower()]
+            for extension in cased_extensions:
+                if file.endswith(extension):
+                    is_valid_extension = True
+                    continue
 
-        is_mp4 = False
 
-        if file.endswith("MP4"):
-            is_mp4 = True
-        if file.endswith("mp4"):
-            is_mp4 = True
-
-        if not is_mp4:
-            print(f"File {file} is not an MP4 file.")
+        if not is_valid_extension:
+            print(f"File {file} is not an proper file.")
+            ignored_files.append(file)
             continue
 
         # Generate full path
@@ -133,11 +147,21 @@ def main():
         # See if the destination file already exists.
         if os.path.isfile(new_filename):
             print(f"The file {new_filename} already exists.")
+            failed_files.append(new_filename)
             continue
 
-        print(f"{new_filename=}")
-
         copy_the_file(full_source_file_path, new_filename)
+
+    # Print the summary
+    print(f"{'=' * 20}")
+    print(f"Number of processed files: {processed_file_count}")
+    print(f"Copied file: {moved_file_count}")
+    print(f"Ignored files:")
+    for ignored_file in ignored_files:
+        print(f"  {ignored_file}")
+    print(f"File that failed to be copied:")
+    for failed_file in failed_files:
+        print(f"  {failed_file}")
 
 
 if __name__ == "__main__":
