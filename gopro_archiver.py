@@ -8,10 +8,17 @@ import yaml
 
 CONFIG_FILE = "config.yml"
 
-def copy_the_file(source, destination):
+def copy_the_file(source, destination) -> bool:
     print(f"Moving file to {destination}")
-    # Copy the file
-    shutil.copy2(source, destination)
+    try:
+        # Copy the file
+        shutil.copy2(source, destination)
+        return True
+    except PermissionError:
+        print("Permissions problem with source or destination:")
+        print(f"Source: {source}")
+        print(f"Destination: {destination}")
+        return False
 
 
 def init_args() -> argparse.ArgumentParser:
@@ -88,7 +95,7 @@ def main():
     ignored_files = []
 
     for file in found_files:
-        processed_file_count =+ 1
+        processed_file_count += 1
         is_valid_extension = False
         for checked_extension in defaults['VALID_EXTENSIONS']:
             cased_extensions = [ checked_extension.upper(), checked_extension.lower()]
@@ -149,16 +156,19 @@ def main():
             failed_files.append(new_filename)
             continue
 
-        copy_the_file(full_source_file_path, new_filename)
+        copy_status = copy_the_file(full_source_file_path, new_filename)
+        if copy_status:
+            moved_file_count += 1
+
 
     # Print the summary
     print(f"{'=' * 20}")
     print(f"Number of processed files: {processed_file_count}")
-    print(f"Copied file: {moved_file_count}")
-    print(f"Ignored files:")
+    print(f"Copied {moved_file_count} files.")
+    print(f"Ignored {len(ignored_files)} files:")
     for ignored_file in ignored_files:
         print(f"  {ignored_file}")
-    print(f"File that failed to be copied:")
+    print(f"Failed to copy {len(failed_files)} files:")
     for failed_file in failed_files:
         print(f"  {failed_file}")
 
