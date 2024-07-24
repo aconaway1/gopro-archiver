@@ -1,1 +1,1 @@
-- Detects continuation of videos from GoPro and rename appropriately
+- Change to os.path.getmtime()
