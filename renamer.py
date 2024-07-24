@@ -1,14 +1,20 @@
+"""
+This script takes files from a directory and copies them to an archive destination with
+specific formatting. It's made for final movie
+"""
 import os
 import datetime
 import shutil
 import argparse
 import sys
-import re
 import yaml
 
 CONFIG_FILE = "config.yml"
 
 def copy_the_file(source, destination) -> bool:
+    """
+    Copy the file from source to destination.
+    """
     print(f"Moving file to {destination}")
     try:
         # Copy the file
@@ -45,6 +51,10 @@ def init_args() -> argparse.ArgumentParser:
     return parser
 
 def main():
+    """
+    Main
+    :return:
+    """
     # Parse the arguments
     parser = init_args()
     # Read in default values
@@ -133,7 +143,8 @@ def main():
             os.mkdir(f"{destination_folder}{create_year}/{create_month}/{create_day}")
 
         # Generate new filename
-        new_filename = f"{destination_folder}{create_year}/{create_month}/{create_day}/{create_date}-{base_name}"
+        new_filename = (f"{destination_folder}{create_year}/{create_month}/{create_day}/"
+                        f"{create_date}-{base_name}")
         # See if the destination file already exists.
         if os.path.isfile(new_filename):
             print(f"The file {new_filename} already exists.")

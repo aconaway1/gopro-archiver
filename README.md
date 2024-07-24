@@ -30,7 +30,8 @@ as `FILENAME-02` with the proper extension.
 ### Renamer
 
 This script takes individual files and copies them to an archive folder in the same manner as the
-GoPro Archiver. 
+GoPro Archiver. The intended purpose is really to take finalized videos (finished videos to publish)
+and copy them individually to archive.
 
 `python renamer.py [ [-s,--source] ] [ [-d,--destination] ]`
 

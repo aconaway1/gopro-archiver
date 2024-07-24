@@ -1,3 +1,6 @@
+"""
+This script takes GoPro movies files from a directory and copies them to an archive destination.
+"""
 import os
 import datetime
 import shutil
@@ -9,6 +12,12 @@ import yaml
 CONFIG_FILE = "config.yml"
 
 def copy_the_file(source, destination) -> bool:
+    """
+    Copy the source file to the destination location.
+    :param source: File to copy
+    :param destination: Destination folder
+    :return: Success or not
+    """
     print(f"Moving file to {destination}")
     try:
         # Copy the file
@@ -44,6 +53,10 @@ def init_args() -> argparse.ArgumentParser:
     return parser
 
 def main():
+    """
+    Main
+    :return:
+    """
     # Parse the arguments
     parser = init_args()
     # Read in default values
@@ -119,7 +132,7 @@ def main():
 
 
         # Detect file chapters
-        search_result = re.search(f"GX(\d\d)", file, re.IGNORECASE)
+        search_result = re.search(r"GX(\d\d)", file, re.IGNORECASE)
         if search_result:
             if search_result.group(1) != "01":
                 file = f"{file[:2]}01{file[4:8]}-{search_result.group(1)}{file[8:]}"
@@ -128,7 +141,7 @@ def main():
         # Get the filename from the path
         # base_name = os.path.basename(full_source_file_path)
         # Get the creation date and time
-        create_epoch = os.path.getctime(full_source_file_path)
+        create_epoch = os.path.getmtime(full_source_file_path)
         # Convert to a datetime object
         create_datetime = datetime.datetime.fromtimestamp(create_epoch)
         # Format the date
@@ -149,7 +162,8 @@ def main():
             os.mkdir(f"{destination_folder}{create_year}/{create_month}/{create_day}")
 
         # Generate new filename
-        new_filename = f"{destination_folder}{create_year}/{create_month}/{create_day}/{create_date}-{file}"
+        new_filename = (f"{destination_folder}{create_year}/{create_month}/{create_day}/"
+                        f"{create_date}-{file}")
         # See if the destination file already exists.
         if os.path.isfile(new_filename):
             print(f"The file {new_filename} already exists.")
