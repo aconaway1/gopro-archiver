@@ -8,10 +8,11 @@ import argparse
 import sys
 import re
 import yaml
+import hashlib
 
 CONFIG_FILE = "config.yml"
 
-def copy_the_file(source, destination) -> bool:
+def copy_the_file(source, destination, hashcheck = True) -> bool:
     """
     Copy the source file to the destination location.
     :param source: File to copy
@@ -22,12 +23,31 @@ def copy_the_file(source, destination) -> bool:
     try:
         # Copy the file
         shutil.copy2(source, destination)
-        return True
     except PermissionError:
         print("Permissions problem with source or destination:")
         print(f"Source: {source}")
         print(f"Destination: {destination}")
         return False
+    if hashcheck:
+        try:
+        # Checksum
+            with open(source, "rb") as src_file:
+                src_contents = src_file.read()
+            with open(destination, "rb") as dst_file:
+                dst_contents = dst_file.read()
+            src_digest = hashlib.md5(src_contents).hexdigest()
+            dst_digest = hashlib.md5(dst_contents).hexdigest()
+            print(f"{src_digest=}")
+            print(f"{dst_digest=}")
+            if src_digest == dst_digest:
+                return True
+            else:
+                print("Digests do not match.")
+                return False
+        except UnicodeDecodeError as e:
+            print("The codec used wasn't right.")
+            print(f"{e}")
+            return False
 
 
 def init_args() -> argparse.ArgumentParser:
@@ -170,9 +190,11 @@ def main():
             failed_files.append(new_filename)
             continue
 
-        copy_status = copy_the_file(full_source_file_path, new_filename)
+        copy_status = copy_the_file(full_source_file_path, new_filename, defaults['HASHCHECK'])
         if copy_status:
             moved_file_count += 1
+        else:
+            failed_files.append(new_filename)
 
 
     # Print the summary
